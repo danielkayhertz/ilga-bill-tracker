@@ -1,0 +1,30 @@
+name: Update Bill Status
+
+on:
+  schedule:
+    - cron: '0 13 * * *'  # Daily 1pm UTC / 8am CT
+  workflow_dispatch: # Allow manual trigger
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Fetch bill status from ILGA
+        run: python scripts/update_bill_status.py
+
+      - name: Commit if changed
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email 'github-actions[bot]@users.noreply.github.com'
+          git add data/bills.json data/user-bills.json
+          git diff --staged --quiet || git commit -m "Update bill status $(date -u +%Y-%m-%d)"
+          git push

@@ -1,0 +1,1746 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>IL Bill Tracker</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&display=swap" rel="stylesheet">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Gotham', 'Montserrat', sans-serif;
+      background-color: #f8f9fa;
+      min-height: 100vh;
+    }
+
+    /* Header */
+    .header {
+      background: linear-gradient(135deg, #005a8c 0%, #007bb8 100%);
+      color: white;
+      padding: 36px 24px;
+      text-align: center;
+    }
+
+    .header-content {
+      max-width: 900px;
+      margin: 0 auto;
+      position: relative;
+    }
+
+    .header h1 {
+      font-size: 38px;
+      font-weight: 700;
+      margin: 0 0 10px 0;
+      letter-spacing: -0.5px;
+    }
+
+    .header p {
+      font-size: 16px;
+      opacity: 0.85;
+      margin: 0 auto;
+      max-width: 560px;
+      line-height: 1.6;
+    }
+
+    .settings-btn {
+      position: absolute;
+      top: 0;
+      right: 0;
+      background: rgba(255,255,255,0.15);
+      border: none;
+      border-radius: 8px;
+      width: 36px;
+      height: 36px;
+      cursor: pointer;
+      color: white;
+      font-size: 18px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background 0.2s;
+    }
+
+    .settings-btn:hover {
+      background: rgba(255,255,255,0.3);
+    }
+
+    /* Stats Bar */
+    .stats-bar {
+      background: white;
+      border-bottom: 1px solid #e0e0e0;
+      padding: 20px 24px;
+    }
+
+    .stats-container {
+      max-width: 1200px;
+      margin: 0 auto;
+      display: flex;
+      justify-content: center;
+      gap: 40px;
+      flex-wrap: wrap;
+    }
+
+    .stat-item {
+      text-align: center;
+    }
+
+    .stat-number {
+      font-size: 30px;
+      font-weight: 700;
+    }
+
+    .stat-number.blue  { color: #005a8c; }
+    .stat-number.green { color: #1b5e20; }
+    .stat-number.red   { color: #c62828; }
+    .stat-number.gray  { color: #6b7280; }
+
+    .stat-label {
+      font-size: 13px;
+      color: #666;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    /* Filters */
+    .filters {
+      background: white;
+      padding: 20px 24px;
+      border-bottom: 1px solid #e0e0e0;
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    }
+
+    .filters-container {
+      max-width: 1200px;
+      margin: 0 auto;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .filters-row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .filter-label {
+      font-weight: 600;
+      color: #333;
+      font-size: 13px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      white-space: nowrap;
+    }
+
+    .filter-select {
+      padding: 9px 14px;
+      border-radius: 8px;
+      border: 2px solid #e0e0e0;
+      font-size: 14px;
+      background-color: white;
+      cursor: pointer;
+      min-width: 150px;
+      color: #333;
+      font-family: inherit;
+    }
+
+    .filter-select:focus {
+      outline: none;
+      border-color: #005a8c;
+    }
+
+    .clear-filters-btn {
+      padding: 9px 14px;
+      border-radius: 8px;
+      border: none;
+      background-color: #ffebee;
+      color: #c62828;
+      font-size: 14px;
+      cursor: pointer;
+      font-weight: 500;
+      font-family: inherit;
+      display: none;
+      white-space: nowrap;
+    }
+
+    .clear-filters-btn.visible {
+      display: inline-block;
+    }
+
+    .filter-count {
+      margin-left: auto;
+      color: #666;
+      font-size: 14px;
+    }
+
+    .last-updated {
+      font-size: 12px;
+      color: #aaa;
+    }
+
+    .filter-toggle {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      font-size: 14px;
+      color: #333;
+      cursor: pointer;
+      white-space: nowrap;
+    }
+
+    .filter-toggle input[type="checkbox"] {
+      width: 15px;
+      height: 15px;
+      cursor: pointer;
+    }
+
+    .add-bill-btn {
+      padding: 9px 16px;
+      background-color: #005a8c;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      font-family: inherit;
+      white-space: nowrap;
+      margin-left: auto;
+    }
+
+    .add-bill-btn:hover {
+      background-color: #004a7a;
+    }
+
+    /* Main Grid */
+    .main-content {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 32px 24px;
+    }
+
+    .legislation-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+      gap: 24px;
+    }
+
+    /* Bill Card */
+    .bill-card {
+      background-color: white;
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+      cursor: pointer;
+      transition: all 0.2s ease;
+      border: 1px solid #e8e8e8;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .bill-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 8px 24px rgba(0,0,0,0.12);
+    }
+
+    .card-header-bar {
+      height: 8px;
+      background: linear-gradient(90deg, #005a8c, #007bb8);
+    }
+
+    .card-body {
+      padding: 24px;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .card-tags {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 12px;
+      flex-wrap: wrap;
+    }
+
+    .tag {
+      padding: 4px 10px;
+      border-radius: 4px;
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .tag.category {
+      background-color: #f5f5f5;
+      color: #666;
+      font-weight: 600;
+    }
+
+    .tag.user-added {
+      background-color: #e8f5e9;
+      color: #2e7d32;
+    }
+
+    .bill-number {
+      font-size: 22px;
+      font-weight: 700;
+      color: #005a8c;
+      margin: 0 0 8px 0;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .note-dot {
+      width: 8px;
+      height: 8px;
+      background: #e98300;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+
+    .bill-title {
+      font-size: 16px;
+      font-weight: 600;
+      color: #333;
+      margin: 0 0 12px 0;
+      line-height: 1.4;
+    }
+
+    .bill-description {
+      font-size: 14px;
+      color: #666;
+      line-height: 1.6;
+      margin: 0 0 16px 0;
+      flex: 1;
+      display: -webkit-box;
+      -webkit-line-clamp: 3;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+
+    .card-footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding-top: 16px;
+      border-top: 1px solid #eee;
+    }
+
+    .status-badge {
+      padding: 6px 12px;
+      border-radius: 6px;
+      font-size: 12px;
+      font-weight: 600;
+    }
+
+    .session-year {
+      font-size: 13px;
+      color: #999;
+      font-weight: 500;
+    }
+
+    .card-ilga-link {
+      font-size: 13px;
+      color: #005a8c;
+      font-weight: 600;
+      text-decoration: none;
+    }
+
+    .card-ilga-link:hover {
+      text-decoration: underline;
+    }
+
+    .last-updated-inline {
+      font-size: 12px;
+      color: #aaa;
+      margin-left: 4px;
+    }
+
+    .modal-last-action {
+      background: #f8f9fa;
+      border: 1px solid #e8e8e8;
+      border-radius: 8px;
+      padding: 12px 16px;
+      margin-bottom: 16px;
+      font-size: 14px;
+      color: #444;
+      line-height: 1.5;
+    }
+
+    .modal-last-action p { margin: 0; }
+
+    .modal-last-action .last-action-date {
+      margin-top: 4px;
+      font-size: 12px;
+      color: #888;
+    }
+
+    .card-sponsor {
+      font-size: 12px;
+      color: #888;
+      margin: -4px 0 10px 0;
+    }
+
+    .card-last-action {
+      font-size: 12px;
+      color: #888;
+      margin: 0 0 12px 0;
+      line-height: 1.4;
+    }
+    .card-last-action-date {
+      font-weight: 600;
+      color: #666;
+    }
+    .card-next-action {
+      font-size: 12px;
+      color: #1a7340;
+      margin: 4px 0 0;
+    }
+    .card-next-action-label { font-weight: 600; margin-right: 2px; }
+    .card-next-action-date  { font-weight: 600; }
+
+    /* Empty State */
+    .empty-state {
+      text-align: center;
+      padding: 64px 24px;
+      color: #666;
+    }
+
+    .empty-state-icon {
+      font-size: 48px;
+      margin-bottom: 16px;
+    }
+
+    .empty-state h3 {
+      margin: 0 0 8px 0;
+      color: #333;
+    }
+
+    /* Modal */
+    .modal-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-color: rgba(0,0,0,0.6);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+      z-index: 100;
+      backdrop-filter: blur(4px);
+    }
+
+    .modal-overlay.visible {
+      display: flex;
+    }
+
+    .modal {
+      background-color: white;
+      border-radius: 16px;
+      max-width: 640px;
+      width: 100%;
+      max-height: 90vh;
+      overflow: auto;
+      box-shadow: 0 24px 48px rgba(0,0,0,0.2);
+    }
+
+    .modal-header {
+      background: linear-gradient(135deg, #005a8c 0%, #007bb8 100%);
+      color: white;
+      padding: 32px;
+      position: relative;
+    }
+
+    .modal-close-btn {
+      position: absolute;
+      top: 16px;
+      right: 16px;
+      background: rgba(255,255,255,0.2);
+      border: none;
+      border-radius: 50%;
+      width: 36px;
+      height: 36px;
+      cursor: pointer;
+      color: white;
+      font-size: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .modal-tags {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 12px;
+      flex-wrap: wrap;
+    }
+
+    .modal-tag {
+      padding: 4px 10px;
+      border-radius: 4px;
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      background-color: rgba(255,255,255,0.2);
+      letter-spacing: 0.5px;
+    }
+
+    .modal-bill-number {
+      font-size: 32px;
+      font-weight: 700;
+      margin: 0 0 8px 0;
+    }
+
+    .modal-bill-title {
+      font-size: 18px;
+      font-weight: 500;
+      margin: 0;
+      opacity: 0.95;
+    }
+
+    .modal-body {
+      padding: 32px;
+    }
+
+    .modal-info-boxes {
+      display: flex;
+      gap: 16px;
+      margin-bottom: 24px;
+      flex-wrap: wrap;
+    }
+
+    .info-box {
+      padding: 12px 16px;
+      border-radius: 8px;
+    }
+
+    .info-box-label {
+      font-size: 11px;
+      color: #666;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 4px;
+    }
+
+    .info-box-value {
+      font-weight: 600;
+    }
+
+    .info-box.session {
+      background-color: #f8f9fa;
+      border: 1px solid #e8e8e8;
+    }
+
+    .info-box.session .info-box-value { color: #333; }
+
+    .info-box.next-action {
+      background-color: #e8f4fd;
+      border: 1px solid #90caf9;
+    }
+
+    .info-box.next-action .info-box-value { color: #0d47a1; }
+
+    .modal-summary-label {
+      font-size: 13px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: #666;
+      margin: 0 0 10px 0;
+    }
+
+    .modal-summary {
+      font-size: 15px;
+      line-height: 1.8;
+      color: #444;
+      margin: 0;
+    }
+
+    /* Notes section */
+    .modal-notes-section {
+      margin-top: 24px;
+      padding-top: 20px;
+      border-top: 1px solid #f0f0f0;
+    }
+
+    .notes-textarea {
+      width: 100%;
+      padding: 10px 14px;
+      border: 2px solid #e0e0e0;
+      border-radius: 8px;
+      font-family: inherit;
+      font-size: 14px;
+      resize: vertical;
+      color: #333;
+      line-height: 1.6;
+    }
+
+    .notes-textarea:focus {
+      outline: none;
+      border-color: #005a8c;
+    }
+
+    .notes-footer {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-top: 10px;
+    }
+
+    .notes-status {
+      font-size: 12px;
+      color: #888;
+    }
+
+    .modal-actions {
+      margin-top: 28px;
+      padding-top: 20px;
+      border-top: 1px solid #eee;
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .btn-primary {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 11px 20px;
+      background-color: #005a8c;
+      color: white;
+      text-decoration: none;
+      border-radius: 8px;
+      font-weight: 600;
+      font-size: 14px;
+      border: none;
+      cursor: pointer;
+      font-family: inherit;
+    }
+
+    .btn-primary:hover { background-color: #004a7a; }
+    .btn-primary:disabled { background-color: #90a4ae; cursor: not-allowed; }
+
+    .btn-secondary {
+      padding: 11px 20px;
+      background-color: #f5f5f5;
+      color: #333;
+      border: none;
+      border-radius: 8px;
+      font-weight: 600;
+      font-size: 14px;
+      cursor: pointer;
+      font-family: inherit;
+    }
+
+    .btn-danger {
+      background: #dc2626;
+      color: #fff;
+      border: none;
+      border-radius: 6px;
+      padding: 10px 20px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      font-family: inherit;
+    }
+    .btn-danger:hover { background: #b91c1c; }
+
+    /* Add Bill Modal form styles */
+    .form-label {
+      display: block;
+      font-size: 12px;
+      font-weight: 700;
+      color: #555;
+      margin-bottom: 6px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .form-input {
+      width: 100%;
+      padding: 10px 14px;
+      border: 2px solid #e0e0e0;
+      border-radius: 8px;
+      font-size: 14px;
+      font-family: inherit;
+      color: #333;
+    }
+
+    .form-input:focus {
+      outline: none;
+      border-color: #005a8c;
+    }
+
+    .form-group {
+      margin-bottom: 16px;
+    }
+
+    .form-row {
+      display: flex;
+      gap: 16px;
+    }
+
+    .form-row .form-group {
+      flex: 1;
+    }
+
+    .lookup-row {
+      display: flex;
+      gap: 8px;
+    }
+
+    .lookup-row .form-input {
+      flex: 1;
+    }
+
+    .lookup-status {
+      font-size: 13px;
+      margin-top: 6px;
+      min-height: 18px;
+    }
+
+    .lookup-status.error   { color: #c62828; }
+    .lookup-status.success { color: #2e7d32; }
+    .lookup-status.loading { color: #888; }
+
+    .ilga-preview {
+      background: #f8f9fa;
+      border: 1px solid #e0e0e0;
+      border-radius: 8px;
+      padding: 12px 14px;
+      margin-top: 10px;
+      margin-bottom: 4px;
+    }
+
+    .preview-row {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 4px;
+      font-size: 13px;
+      line-height: 1.5;
+    }
+
+    .preview-row:last-child { margin-bottom: 0; }
+
+    .preview-label {
+      font-weight: 600;
+      color: #666;
+      min-width: 120px;
+      flex-shrink: 0;
+    }
+
+    .required { color: #c62828; }
+
+    .add-bill-error {
+      font-size: 13px;
+      color: #c62828;
+      margin-bottom: 8px;
+      padding: 8px 12px;
+      background: #ffebee;
+      border-radius: 6px;
+    }
+
+    /* Setup modal note */
+    .setup-note {
+      font-size: 13px;
+      color: #666;
+      margin-top: 6px;
+      line-height: 1.5;
+    }
+
+    .setup-note a {
+      color: #005a8c;
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      .header h1 { font-size: 26px; }
+      .stats-container { gap: 20px; }
+      .stat-number { font-size: 24px; }
+      .filters-row { flex-direction: column; align-items: stretch; }
+      .filter-select { width: 100%; }
+      .filter-count { margin-left: 0; text-align: center; }
+      .legislation-grid { grid-template-columns: 1fr; }
+      .form-row { flex-direction: column; }
+      .add-bill-btn { margin-left: 0; }
+    }
+  </style>
+</head>
+<body>
+  <!-- Header -->
+  <header class="header">
+    <div class="header-content">
+      <h1>IL Bill Tracker</h1>
+      <p>Shared notes, custom bill tracking, and real-time stage monitoring for the Illinois legislative agenda</p>
+      <button class="settings-btn" onclick="openSetupModal()" title="Settings">&#9881;</button>
+    </div>
+  </header>
+
+  <!-- Stats Bar -->
+  <div class="stats-bar">
+    <div class="stats-container">
+      <div class="stat-item">
+        <div class="stat-number blue" id="total-bills">0</div>
+        <div class="stat-label">Bills Tracked</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-number gray" id="in-committee-bills">0</div>
+        <div class="stat-label">In Committee</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-number blue" id="passed-bills">0</div>
+        <div class="stat-label">Passed</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-number green" id="signed-bills">0</div>
+        <div class="stat-label">Signed into Law</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-number red" id="failed-bills">0</div>
+        <div class="stat-label">Failed</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Filters -->
+  <div class="filters">
+    <div class="filters-container">
+      <!-- Row 1 -->
+      <div class="filters-row">
+        <span class="filter-label">Filter:</span>
+
+        <select class="filter-select" id="status-filter">
+          <option value="All">All Statuses</option>
+          <option value="Passed into law">Passed into law</option>
+          <option value="Not passed into law">Not passed into law</option>
+        </select>
+
+        <select class="filter-select" id="year-filter">
+          <option value="All">All Years</option>
+          <option value="2026">2026</option>
+          <option value="2025">2025</option>
+        </select>
+
+        <button class="clear-filters-btn" id="clear-filters">Clear Filters</button>
+
+        <span class="filter-count" id="filter-count">Showing 0 of 0 bills</span>
+        <span class="last-updated" id="last-updated"></span>
+      </div>
+
+      <!-- Row 2 -->
+      <div class="filters-row">
+        <span class="filter-label">Last action since:</span>
+        <input type="date" id="changed-since-filter" class="filter-select" style="min-width:150px;">
+
+        <label class="filter-toggle">
+          <input type="checkbox" id="hearings-filter">
+          <span>Upcoming actions only</span>
+        </label>
+
+        <button class="add-bill-btn" onclick="openAddBillModal()">&#xff0b; Add Bill</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Main Content -->
+  <main class="main-content">
+    <div class="legislation-grid" id="legislation-grid">
+      <!-- Cards injected here -->
+    </div>
+
+    <div class="empty-state" id="empty-state" style="display: none;">
+      <div class="empty-state-icon">📭</div>
+      <h3>No bills match your filters</h3>
+      <p>Try adjusting your filter criteria, or add a bill using the button above</p>
+    </div>
+  </main>
+
+  <!-- Bill Detail Modal -->
+  <div class="modal-overlay" id="modal-overlay">
+    <div class="modal">
+      <div class="modal-header" id="modal-header">
+        <button class="modal-close-btn" id="modal-close">&#215;</button>
+        <div class="modal-tags" id="modal-tags"></div>
+        <h2 class="modal-bill-number" id="modal-bill-number"></h2>
+        <h3 class="modal-bill-title" id="modal-bill-title"></h3>
+      </div>
+      <div class="modal-body">
+        <div class="modal-info-boxes">
+          <div class="info-box" id="modal-stage-box">
+            <div class="info-box-label">Legislative Stage</div>
+            <div class="info-box-value" id="modal-stage"></div>
+          </div>
+          <div class="info-box session">
+            <div class="info-box-label">Session</div>
+            <div class="info-box-value" id="modal-session"></div>
+          </div>
+          <div class="info-box next-action" id="modal-next-action-box" style="display:none;">
+            <div class="info-box-label">Next Action</div>
+            <div class="info-box-value" id="modal-next-action"></div>
+          </div>
+        </div>
+        <div class="modal-last-action" id="modal-last-action-section" style="display:none;">
+          <p><strong>Last Action:</strong> <span id="modal-last-action"></span></p>
+          <p class="last-action-date" id="modal-last-action-date"></p>
+        </div>
+        <h4 class="modal-summary-label">Summary</h4>
+        <p class="modal-summary" id="modal-summary"></p>
+
+        <!-- Notes -->
+        <div class="modal-notes-section">
+          <h4 class="modal-summary-label">Notes</h4>
+          <textarea id="modal-notes-text" class="notes-textarea" rows="4" placeholder="Add notes for this bill..."></textarea>
+          <div class="notes-footer">
+            <span id="notes-status" class="notes-status"></span>
+            <button class="btn-primary" onclick="saveNote()">Save Note</button>
+          </div>
+        </div>
+
+        <div class="modal-actions">
+          <a class="btn-primary" id="modal-link" href="#" target="_blank" rel="noopener noreferrer">View on ILGA.gov &#8594;</a>
+          <button class="btn-secondary" id="modal-refresh-btn" style="display:none;" onclick="refreshBillILGA()">Refresh from ILGA</button>
+          <button class="btn-danger" id="modal-delete-btn" style="display:none;" onclick="confirmDeleteBill()">Delete Bill</button>
+          <button class="btn-secondary" id="modal-close-btn">Close</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Add Bill Modal -->
+  <div class="modal-overlay" id="add-bill-overlay">
+    <div class="modal">
+      <div class="modal-header">
+        <button class="modal-close-btn" onclick="closeAddBillModal()">&#215;</button>
+        <div class="modal-tags">
+          <span class="modal-tag">New Bill</span>
+        </div>
+        <h2 class="modal-bill-number">Add Bill</h2>
+        <h3 class="modal-bill-title">Track a new bill in this session</h3>
+      </div>
+      <div class="modal-body">
+        <!-- Bill number + ILGA lookup -->
+        <div class="form-group">
+          <label class="form-label">Bill Number</label>
+          <div class="lookup-row">
+            <input type="text" id="add-bill-number-input" class="form-input" placeholder="e.g. HB1234 or SB567" style="text-transform:uppercase;">
+            <button class="btn-secondary" onclick="lookupBillILGA()">Look up on ILGA</button>
+          </div>
+          <div id="lookup-status" class="lookup-status"></div>
+          <div id="ilga-preview" class="ilga-preview" style="display:none;">
+            <div class="preview-row">
+              <span class="preview-label">Primary Sponsor:</span>
+              <span id="preview-sponsor"></span>
+            </div>
+            <div class="preview-row">
+              <span class="preview-label">Current Stage:</span>
+              <span id="preview-stage"></span>
+            </div>
+            <div class="preview-row">
+              <span class="preview-label">Last Action:</span>
+              <span id="preview-last-action"></span>
+            </div>
+            <div class="preview-row" id="preview-next-action-row" style="display:none;">
+              <span class="preview-label">Next Action:</span>
+              <span id="preview-next-action"></span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Manual fields -->
+        <div class="form-group">
+          <label class="form-label">Title <span class="required">*</span></label>
+          <input type="text" id="add-bill-title" class="form-input" placeholder="Short descriptive title">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Category</label>
+          <select id="add-bill-category" class="filter-select" style="width:100%;min-width:0;">
+            <option>Housing</option>
+            <option>Affordable Housing Development</option>
+            <option>Property Taxes</option>
+            <option>Public Housing</option>
+            <option>Tenant Protections</option>
+            <option>Transportation</option>
+            <option>Zoning</option>
+            <option>Other</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Description / Summary</label>
+          <textarea id="add-bill-description" class="notes-textarea" rows="4" placeholder="Optional — brief description of the bill..."></textarea>
+        </div>
+
+        <div id="add-bill-error" class="add-bill-error" style="display:none;"></div>
+
+        <div class="modal-actions" style="padding-top:16px;margin-top:0;border-top:none;">
+          <button class="btn-primary" id="add-bill-submit" onclick="submitAddBill()">Add Bill</button>
+          <button class="btn-secondary" onclick="closeAddBillModal()">Cancel</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Setup / Settings Modal -->
+  <div class="modal-overlay" id="setup-overlay">
+    <div class="modal">
+      <div class="modal-header">
+        <div class="modal-tags">
+          <span class="modal-tag">Setup</span>
+        </div>
+        <h2 class="modal-bill-number">Connect to GitHub</h2>
+        <h3 class="modal-bill-title">Configure your repository and access token</h3>
+      </div>
+      <div class="modal-body">
+        <p style="margin-bottom:20px;font-size:14px;color:#555;line-height:1.6;">
+          This tracker stores bill data in a GitHub repository you control.
+          Your token is saved only in <strong>your browser's localStorage</strong> — it is never sent anywhere except directly to <code>api.github.com</code>.
+        </p>
+
+        <div class="form-group">
+          <label class="form-label">GitHub Username or Organization <span class="required">*</span></label>
+          <input type="text" id="setup-owner" class="form-input" placeholder="e.g. myorg or myusername" autocomplete="off">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Repository Name <span class="required">*</span></label>
+          <input type="text" id="setup-repo" class="form-input" placeholder="e.g. ilga-bill-tracker" autocomplete="off">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Personal Access Token <span class="required">*</span></label>
+          <input type="password" id="setup-token" class="form-input" placeholder="github_pat_..." autocomplete="off">
+          <p class="setup-note">
+            Fine-grained PAT with <strong>Contents: Read and write</strong> on this repo only.
+            <a href="https://github.com/settings/personal-access-tokens/new" target="_blank" rel="noopener">Create one on GitHub &#8599;</a>
+          </p>
+        </div>
+
+        <div id="setup-error" class="add-bill-error" style="display:none;"></div>
+
+        <div class="modal-actions" style="padding-top:16px;margin-top:0;border-top:none;">
+          <button class="btn-primary" id="setup-submit" onclick="saveSetup()">Save &amp; Connect</button>
+          <button class="btn-secondary" id="setup-cancel" onclick="closeSetupModal()" style="display:none;">Cancel</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // ── Stage / status styling ────────────────────────────────────────────────
+    const stageConfig = {
+      "Signed into Law":             { bg: "#e8f5e9", text: "#1b5e20", border: "#81c784" },
+      "Awaiting Governor Signature": { bg: "#e3f2fd", text: "#0d47a1", border: "#90caf9" },
+      "Enrolled":                    { bg: "#c8e6c9", text: "#2e7d32", border: "#66bb6a" },
+      "Passed House":                { bg: "#f0f7f0", text: "#2e7d32", border: "#a5d6a7" },
+      "Passed Senate":               { bg: "#f0f7f0", text: "#2e7d32", border: "#a5d6a7" },
+      "In House Committee":          { bg: "#f5f5f5", text: "#616161", border: "#bdbdbd" },
+      "In Senate Committee":         { bg: "#efefef", text: "#616161", border: "#bdbdbd" },
+      "Failed":                      { bg: "#fce4ec", text: "#b71c1c", border: "#ef9a9a" },
+      "Unknown":                     { bg: "#f5f5f5", text: "#9e9e9e", border: "#e0e0e0" }
+    };
+
+    const statusConfig = {
+      "Passed into law":     { bg: "#e8f5e9", text: "#1b5e20", border: "#81c784" },
+      "Not passed into law": { bg: "#f5f5f5", text: "#616161", border: "#bdbdbd" }
+    };
+
+    // ── State ─────────────────────────────────────────────────────────────────
+    let legislationData = [];
+    let notesData       = {};
+    let currentBill     = null;
+    let addBillIlgaData = null;
+    let currentFilters  = { status: "All", year: "All", changedSince: "", upcomingOnly: false };
+
+    // ── DOM refs ──────────────────────────────────────────────────────────────
+    const grid            = document.getElementById('legislation-grid');
+    const emptyState      = document.getElementById('empty-state');
+    const modalOverlay    = document.getElementById('modal-overlay');
+    const statusFilter    = document.getElementById('status-filter');
+    const yearFilter      = document.getElementById('year-filter');
+    const changedSinceEl  = document.getElementById('changed-since-filter');
+    const hearingsEl      = document.getElementById('hearings-filter');
+    const clearFiltersBtn = document.getElementById('clear-filters');
+    const filterCount     = document.getElementById('filter-count');
+
+    // ── Config (stored in localStorage) ──────────────────────────────────────
+    function getConfig() {
+      return JSON.parse(localStorage.getItem('gh_config') || 'null');
+    }
+
+    // ── Setup modal ───────────────────────────────────────────────────────────
+    function openSetupModal() {
+      const cfg = getConfig();
+      if (cfg) {
+        document.getElementById('setup-owner').value = cfg.owner || '';
+        document.getElementById('setup-repo').value  = cfg.repo  || '';
+        document.getElementById('setup-token').value = cfg.token || '';
+        // Show Cancel button only when already configured (not first-run)
+        document.getElementById('setup-cancel').style.display = 'inline-block';
+      } else {
+        document.getElementById('setup-owner').value = '';
+        document.getElementById('setup-repo').value  = '';
+        document.getElementById('setup-token').value = '';
+        document.getElementById('setup-cancel').style.display = 'none';
+      }
+      document.getElementById('setup-error').style.display = 'none';
+      document.getElementById('setup-overlay').classList.add('visible');
+      document.body.style.overflow = 'hidden';
+    }
+
+    function closeSetupModal() {
+      document.getElementById('setup-overlay').classList.remove('visible');
+      document.body.style.overflow = '';
+    }
+
+    async function saveSetup() {
+      const owner = document.getElementById('setup-owner').value.trim();
+      const repo  = document.getElementById('setup-repo').value.trim();
+      const token = document.getElementById('setup-token').value.trim();
+      const errEl = document.getElementById('setup-error');
+      const btn   = document.getElementById('setup-submit');
+
+      if (!owner || !repo || !token) {
+        errEl.textContent = 'All fields are required.';
+        errEl.style.display = 'block';
+        return;
+      }
+
+      btn.textContent = 'Connecting…';
+      btn.disabled = true;
+      errEl.style.display = 'none';
+
+      // Verify the token works against the repo
+      try {
+        const r = await fetch(`https://api.github.com/repos/${owner}/${repo}`, {
+          headers: { Authorization: `token ${token}`, Accept: 'application/vnd.github.v3+json' }
+        });
+        if (r.status === 401) throw new Error('Invalid token — please check your Personal Access Token.');
+        if (r.status === 404) throw new Error('Repository not found — check the owner and repo name, and make sure the repo exists.');
+        if (!r.ok) throw new Error(`GitHub API error: ${r.status}`);
+      } catch (e) {
+        errEl.textContent = e.message;
+        errEl.style.display = 'block';
+        btn.textContent = 'Save & Connect';
+        btn.disabled = false;
+        return;
+      }
+
+      localStorage.setItem('gh_config', JSON.stringify({ owner, repo, token }));
+      closeSetupModal();
+      btn.textContent = 'Save & Connect';
+      btn.disabled = false;
+      // Reset and reload
+      legislationData = [];
+      notesData = {};
+      updateStats();
+      renderCards();
+      init();
+    }
+
+    // ── GitHub API helpers ────────────────────────────────────────────────────
+    async function readGitHubFile(path) {
+      const { owner, repo, token } = getConfig();
+      const r = await fetch(`https://api.github.com/repos/${owner}/${repo}/contents/${path}`, {
+        headers: {
+          Authorization: `token ${token}`,
+          Accept: 'application/vnd.github.v3+json'
+        }
+      });
+      if (r.status === 404) return { content: null, sha: null };
+      if (!r.ok) throw new Error(`GitHub API ${r.status}`);
+      const d = await r.json();
+      return { content: JSON.parse(atob(d.content.replace(/\n/g, ''))), sha: d.sha };
+    }
+
+    async function writeGitHubFile(path, content, sha, message) {
+      const { owner, repo, token } = getConfig();
+      const body = {
+        message,
+        content: btoa(unescape(encodeURIComponent(JSON.stringify(content, null, 2))))
+      };
+      if (sha) body.sha = sha;
+      const r = await fetch(`https://api.github.com/repos/${owner}/${repo}/contents/${path}`, {
+        method: 'PUT',
+        headers: {
+          Authorization: `token ${token}`,
+          Accept: 'application/vnd.github.v3+json',
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(body)
+      });
+      if (r.status === 409) throw new Error('conflict');
+      if (!r.ok) throw new Error(`GitHub API ${r.status}`);
+      return r.json();
+    }
+
+    // ── Init ──────────────────────────────────────────────────────────────────
+    async function init() {
+      const cfg = getConfig();
+      if (!cfg) {
+        openSetupModal();
+        return;
+      }
+
+      const { owner, repo } = cfg;
+
+      // bills.json is public — fetch via raw.githubusercontent.com (no auth needed)
+      try {
+        const billsResp = await fetch(`https://raw.githubusercontent.com/${owner}/${repo}/main/data/bills.json`);
+        if (!billsResp.ok) throw new Error(`HTTP ${billsResp.status}`);
+        legislationData = await billsResp.json();
+      } catch (e) {
+        console.warn('Could not load bills.json:', e);
+        legislationData = [];
+      }
+
+      // GitHub API files (user-bills, notes) require the token
+      try {
+        const [userBillsResp, notesResp] = await Promise.all([
+          readGitHubFile('data/user-bills.json'),
+          readGitHubFile('data/notes.json')
+        ]);
+        const userBills = userBillsResp.content || [];
+        notesData = notesResp.content || {};
+        if (userBills.length > 0) {
+          legislationData = [...legislationData, ...userBills];
+        }
+      } catch (e) {
+        console.warn('GitHub API unavailable:', e);
+        notesData = {};
+      }
+
+      updateStats();
+      renderCards();
+      setupEventListeners();
+      updateLastFetched();
+    }
+
+    function updateLastFetched() {
+      const el = document.getElementById('last-updated');
+      if (!el) return;
+      const date = legislationData[0]?.ilgaFetchedAt;
+      if (date) {
+        el.textContent = 'Status updated ' + new Date(date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+      }
+    }
+
+    function updateStats() {
+      const committeeStages = ["In House Committee", "In Senate Committee"];
+      const passedStages    = ["Passed House", "Passed Senate", "Enrolled", "Awaiting Governor Signature"];
+
+      document.getElementById('total-bills').textContent        = legislationData.length;
+      document.getElementById('in-committee-bills').textContent = legislationData.filter(b => committeeStages.includes(b.stage)).length;
+      document.getElementById('passed-bills').textContent       = legislationData.filter(b => passedStages.includes(b.stage)).length;
+      document.getElementById('signed-bills').textContent       = legislationData.filter(b => b.stage === 'Signed into Law').length;
+      document.getElementById('failed-bills').textContent       = legislationData.filter(b => b.stage === 'Failed').length;
+    }
+
+    function getFilteredData() {
+      const today = new Date().toISOString().split('T')[0];
+      return legislationData.filter(bill => {
+        if (currentFilters.status !== "All" && bill.status !== currentFilters.status) return false;
+        if (currentFilters.year   !== "All" && !bill.year.includes(parseInt(currentFilters.year))) return false;
+        // Last-action filter
+        if (currentFilters.changedSince) {
+          if (!bill.lastActionDate) return false;
+          const [m, d, y] = bill.lastActionDate.split('/');
+          const isoDate = `${y}-${m.padStart(2,'0')}-${d.padStart(2,'0')}`;
+          if (isoDate < currentFilters.changedSince) return false;
+        }
+        // Upcoming actions filter
+        if (currentFilters.upcomingOnly) {
+          if (!bill.nextActionDate) return false;
+          const [m, d, y] = bill.nextActionDate.split('/');
+          const isoDate = `${y}-${m.padStart(2,'0')}-${d.padStart(2,'0')}`;
+          if (isoDate < today) return false;
+        }
+        return true;
+      });
+    }
+
+    function getYearDisplay(yearArr) {
+      if (yearArr.length === 1) return yearArr[0] + ' Session';
+      return yearArr.join(' / ') + ' Session';
+    }
+
+    function renderCards() {
+      const filtered = getFilteredData();
+      grid.innerHTML = '';
+
+      if (filtered.length === 0) {
+        emptyState.style.display = 'block';
+        grid.style.display = 'none';
+      } else {
+        emptyState.style.display = 'none';
+        grid.style.display = 'grid';
+        filtered.forEach(bill => grid.appendChild(createCard(bill)));
+      }
+
+      filterCount.textContent = `Showing ${filtered.length} of ${legislationData.length} bills`;
+
+      const isFiltered = currentFilters.status !== "All"
+        || currentFilters.year   !== "All"
+        || currentFilters.changedSince !== ""
+        || currentFilters.upcomingOnly;
+      clearFiltersBtn.classList.toggle('visible', isFiltered);
+    }
+
+    function createCard(bill) {
+      const card = document.createElement('article');
+      card.className = 'bill-card';
+      card.onclick = () => openModal(bill);
+
+      const stage = bill.stage || bill.status;
+      const stageStyle = stageConfig[stage] || stageConfig[bill.status] || { bg: '#f5f5f5', text: '#666', border: '#ddd' };
+      const hasNote = !!(notesData[bill.billNumber]?.text);
+
+      card.innerHTML = `
+        <div class="card-header-bar"></div>
+        <div class="card-body">
+          <div class="card-tags">
+            ${bill.category ? `<span class="tag category">${bill.category}</span>` : ''}
+            ${bill.userAdded ? '<span class="tag user-added">Added</span>' : ''}
+          </div>
+          <div class="bill-number">
+            ${bill.billNumber}
+            ${hasNote ? '<span class="note-dot" title="Has note"></span>' : ''}
+          </div>
+          ${bill.primarySponsor ? `<p class="card-sponsor">${bill.primarySponsor}</p>` : ''}
+          <h4 class="bill-title">${bill.title}</h4>
+          <p class="bill-description">${bill.description || ''}</p>
+          ${bill.lastActionDate ? `
+          <p class="card-last-action">
+            <span class="card-last-action-date">${bill.lastActionDate}</span>
+            ${bill.lastAction ? ` — ${bill.lastAction}` : ''}
+          </p>` : ''}
+          ${bill.nextActionDate ? `
+          <p class="card-next-action">
+            <span class="card-next-action-label">Next:</span>
+            <span class="card-next-action-date">${bill.nextActionDate}</span>
+            ${bill.nextActionType ? ` — ${bill.nextActionType}` : ''}
+          </p>` : ''}
+          <div class="card-footer">
+            <span class="status-badge" style="background-color:${stageStyle.bg};color:${stageStyle.text};border:1px solid ${stageStyle.border};">${stage}</span>
+            <span class="session-year">${getYearDisplay(bill.year)}</span>
+          </div>
+        </div>
+      `;
+
+      return card;
+    }
+
+    function openModal(bill) {
+      currentBill = bill;
+      const stage      = bill.stage || bill.status;
+      const stageStyle = stageConfig[stage] || stageConfig[bill.status] || { bg: '#f5f5f5', text: '#666', border: '#ddd' };
+
+      document.getElementById('modal-tags').innerHTML = `
+        ${bill.category ? `<span class="modal-tag">${bill.category}</span>` : ''}
+        ${bill.userAdded ? '<span class="modal-tag">User Added</span>' : ''}
+      `;
+      document.getElementById('modal-bill-number').textContent = bill.billNumber;
+      document.getElementById('modal-bill-title').textContent  = bill.title;
+
+      // Stage box
+      const stageBox = document.getElementById('modal-stage-box');
+      stageBox.style.backgroundColor = stageStyle.bg;
+      stageBox.style.border = `1px solid ${stageStyle.border}`;
+      document.getElementById('modal-stage').textContent  = stage;
+      document.getElementById('modal-stage').style.color  = stageStyle.text;
+
+      document.getElementById('modal-session').textContent = getYearDisplay(bill.year) + ' — Illinois General Assembly';
+
+      // Next action box
+      const nextActionBox = document.getElementById('modal-next-action-box');
+      if (bill.nextActionDate) {
+        nextActionBox.style.display = 'block';
+        const naText = bill.nextActionDate + (bill.nextActionType ? ` — ${bill.nextActionType}` : '');
+        document.getElementById('modal-next-action').textContent = naText;
+      } else {
+        nextActionBox.style.display = 'none';
+      }
+
+      // Last action
+      const lastActionSection = document.getElementById('modal-last-action-section');
+      if (bill.lastAction) {
+        lastActionSection.style.display = 'block';
+        document.getElementById('modal-last-action').textContent     = bill.lastAction;
+        document.getElementById('modal-last-action-date').textContent = bill.lastActionDate || '';
+      } else {
+        lastActionSection.style.display = 'none';
+      }
+
+      document.getElementById('modal-summary').textContent = bill.description || '';
+      document.getElementById('modal-link').href           = bill.url;
+
+      // Notes
+      document.getElementById('modal-notes-text').value = notesData[bill.billNumber]?.text || '';
+      document.getElementById('notes-status').textContent = '';
+
+      document.getElementById('modal-refresh-btn').style.display =
+        bill.userAdded ? 'inline-block' : 'none';
+      document.getElementById('modal-delete-btn').style.display =
+        bill.userAdded ? 'inline-block' : 'none';
+
+      modalOverlay.classList.add('visible');
+      document.body.style.overflow = 'hidden';
+    }
+
+    function closeModal() {
+      modalOverlay.classList.remove('visible');
+      document.body.style.overflow = '';
+      currentBill = null;
+    }
+
+    function confirmDeleteBill() {
+      if (!currentBill) return;
+      const ok = confirm(`Delete ${currentBill.billNumber} — "${currentBill.title}"?\n\nThis cannot be undone.`);
+      if (ok) deleteBill(currentBill);
+    }
+
+    async function deleteBill(bill) {
+      const deleteBtn = document.getElementById('modal-delete-btn');
+      deleteBtn.disabled = true;
+      deleteBtn.textContent = 'Deleting…';
+      try {
+        const { content, sha } = await readGitHubFile('data/user-bills.json');
+        const updated = (content || []).filter(b => b.billNumber !== bill.billNumber);
+        await writeGitHubFile('data/user-bills.json', updated, sha, `Delete bill: ${bill.billNumber}`);
+        legislationData = legislationData.filter(b => b.billNumber !== bill.billNumber);
+        closeModal();
+        updateStats();
+        renderCards();
+      } catch (e) {
+        alert(`Delete failed: ${e.message}`);
+        deleteBtn.disabled = false;
+        deleteBtn.textContent = 'Delete Bill';
+      }
+    }
+
+    async function refreshBillILGA() {
+      if (!currentBill) return;
+      const refreshBtn = document.getElementById('modal-refresh-btn');
+      refreshBtn.disabled = true;
+      refreshBtn.textContent = 'Refreshing…';
+      try {
+        const data = await fetchBillFromILGA(currentBill.billNumber);
+        const updates = {
+          primarySponsor: data.primarySponsor,
+          stage:          data.stage,
+          lastAction:     data.lastAction,
+          lastActionDate: data.lastActionDate,
+          nextActionDate: data.nextActionDate,
+          nextActionType: data.nextActionType,
+          ilgaFetchedAt:  new Date().toISOString(),
+        };
+        const { content, sha } = await readGitHubFile('data/user-bills.json');
+        const userBills = (content || []).map(b =>
+          b.billNumber === currentBill.billNumber ? { ...b, ...updates } : b
+        );
+        await writeGitHubFile('data/user-bills.json', userBills, sha, `Refresh bill: ${currentBill.billNumber}`);
+        Object.assign(currentBill, updates);
+        legislationData = legislationData.map(b =>
+          b.billNumber === currentBill.billNumber ? { ...b, ...updates } : b
+        );
+        renderCards();
+        openModal(currentBill);
+      } catch (e) {
+        alert(`Refresh failed: ${e.message}`);
+        refreshBtn.disabled = false;
+        refreshBtn.textContent = 'Refresh from ILGA';
+      }
+    }
+
+    // ── Save note ─────────────────────────────────────────────────────────────
+    async function saveNote() {
+      if (!currentBill) return;
+      const billNumber = currentBill.billNumber;
+      const text       = document.getElementById('modal-notes-text').value;
+      const statusEl   = document.getElementById('notes-status');
+      statusEl.textContent = 'Saving…';
+
+      async function doSave() {
+        const { content, sha } = await readGitHubFile('data/notes.json');
+        const notes = content || {};
+        notes[billNumber] = { text, updatedAt: new Date().toISOString() };
+        await writeGitHubFile('data/notes.json', notes, sha, `Update note: ${billNumber}`);
+        notesData = notes;
+        statusEl.textContent = 'Saved ✓';
+        renderCards();
+      }
+
+      try {
+        await doSave();
+      } catch (e) {
+        if (e.message === 'conflict') {
+          try {
+            await doSave(); // retry once on conflict
+          } catch (e2) {
+            statusEl.textContent = 'Error — please try again';
+          }
+        } else {
+          statusEl.textContent = e.message.includes('401')
+            ? 'Auth error — check your Personal Access Token in Settings (⚙)'
+            : `Error: ${e.message}`;
+        }
+      }
+    }
+
+    // ── ILGA fetch (browser-side, for add-bill lookup) ───────────────────────
+    async function fetchBillFromILGA(rawBillNumber) {
+      const m = rawBillNumber.trim().toUpperCase().match(/^([A-Z]+)(\d+)$/);
+      if (!m) throw new Error('Invalid format — use e.g. HB1234 or SB567.');
+      const docType = m[1], docNum = m[2].padStart(4, '0');
+      const xmlUrl  = `https://www.ilga.gov/ftp/legislation/104/BillStatus/XML/10400${docType}${docNum}.xml`;
+
+      let text;
+      // Try direct fetch; fall back to CORS proxy if blocked
+      try {
+        const resp = await fetch(xmlUrl);
+        if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
+        text = await resp.text();
+      } catch (directErr) {
+        try {
+          const proxy = `https://corsproxy.io/?url=${encodeURIComponent(xmlUrl)}`;
+          const resp  = await fetch(proxy);
+          if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
+          text = await resp.text();
+        } catch (proxyErr) {
+          throw new Error('Could not reach ILGA.gov. Fill in details manually — the daily update will populate ILGA fields automatically.');
+        }
+      }
+
+      const xml = new DOMParser().parseFromString(text, 'text/xml');
+      if (xml.querySelector('parsererror')) throw new Error('Bill not found or XML parse error.');
+
+      // Primary sponsor
+      const sponsorsEl = xml.querySelector('sponsor > sponsors');
+      const primarySponsor = sponsorsEl?.textContent?.trim().split(/[-,]|\s+and\s+/)[0]?.trim() || '';
+
+      // Last action
+      const lastActionEl  = xml.querySelector('lastaction > action');
+      const lastDateEl    = xml.querySelector('lastaction > statusdate');
+      const lastAction    = lastActionEl?.textContent?.trim() || '';
+      const lastActionDate= lastDateEl?.textContent?.trim() || '';
+
+      // Next scheduled action — may be in <nextaction> or <committeehearing>
+      const nextActionEl_  = xml.querySelector('nextaction > action');
+      const nextDateEl_    = xml.querySelector('nextaction > statusdate');
+      let nextActionDate   = nextDateEl_?.textContent?.trim()  || null;
+      let nextActionType   = nextActionEl_?.textContent?.trim()|| null;
+      if (!nextActionDate) {
+        const chEl = xml.querySelector('committeehearing');
+        if (chEl) {
+          const raw = chEl.textContent.trim();
+          const dm  = raw.match(/\b(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)\s+(\d{1,2})\s+(\d{4})\b/);
+          if (dm) {
+            const mo = {Jan:1,Feb:2,Mar:3,Apr:4,May:5,Jun:6,Jul:7,Aug:8,Sep:9,Oct:10,Nov:11,Dec:12};
+            nextActionDate = `${mo[dm[1]]}/${parseInt(dm[2])}/${dm[3]}`;
+            nextActionType = raw.slice(0, dm.index).trim() || null;
+          }
+        }
+      }
+
+      // Stage (simplified mirror of Python logic)
+      const la = lastAction.toLowerCase();
+      let stage;
+      if      (la.includes('approved by governor') || la.includes('public act')) stage = 'Signed into Law';
+      else if (la.includes('to the governor'))                                   stage = 'Awaiting Governor Signature';
+      else if (la.includes('enrolled'))                                          stage = 'Enrolled';
+      else if (la.includes('passed senate'))                                     stage = 'Passed Senate';
+      else if (la.includes('passed house'))                                      stage = 'Passed House';
+      else if (la.includes('vetoed') || la.includes('failed') || la.includes('tabled') || la.includes('withdrawn')) stage = 'Failed';
+      else stage = docType === 'HB' ? 'In House Committee' : 'In Senate Committee';
+
+      const ilgaUrl = `https://www.ilga.gov/Legislation/BillStatus?DocNum=${m[2]}&GAID=18&DocTypeID=${docType}&SessionID=114`;
+      return {
+        billNumber: rawBillNumber.trim().toUpperCase(),
+        primarySponsor, stage, lastAction, lastActionDate,
+        nextActionDate, nextActionType, ilgaUrl
+      };
+    }
+
+    // ── Add Bill modal ────────────────────────────────────────────────────────
+    function openAddBillModal() {
+      document.getElementById('add-bill-number-input').value = '';
+      document.getElementById('add-bill-title').value        = '';
+      document.getElementById('add-bill-category').value     = 'Housing';
+      document.getElementById('add-bill-description').value  = '';
+      document.getElementById('ilga-preview').style.display  = 'none';
+      document.getElementById('lookup-status').textContent   = '';
+      document.getElementById('lookup-status').className     = 'lookup-status';
+      document.getElementById('add-bill-error').style.display= 'none';
+      addBillIlgaData = null;
+      document.getElementById('add-bill-overlay').classList.add('visible');
+      document.body.style.overflow = 'hidden';
+    }
+
+    function closeAddBillModal() {
+      document.getElementById('add-bill-overlay').classList.remove('visible');
+      document.body.style.overflow = '';
+    }
+
+    async function lookupBillILGA() {
+      const rawNum   = document.getElementById('add-bill-number-input').value.trim();
+      const statusEl = document.getElementById('lookup-status');
+      const previewEl= document.getElementById('ilga-preview');
+
+      if (!rawNum) {
+        statusEl.textContent = 'Please enter a bill number first.';
+        statusEl.className   = 'lookup-status error';
+        return;
+      }
+
+      statusEl.textContent = 'Looking up…';
+      statusEl.className   = 'lookup-status loading';
+      previewEl.style.display = 'none';
+      document.getElementById('preview-next-action-row').style.display = 'none';
+      addBillIlgaData = null;
+
+      try {
+        const data = await fetchBillFromILGA(rawNum);
+        addBillIlgaData = data;
+        document.getElementById('preview-sponsor').textContent    = data.primarySponsor || '(not found)';
+        document.getElementById('preview-stage').textContent      = data.stage;
+        document.getElementById('preview-last-action').textContent= data.lastAction
+          + (data.lastActionDate ? ` (${data.lastActionDate})` : '');
+        const nextActionRowEl = document.getElementById('preview-next-action-row');
+        if (data.nextActionDate) {
+          document.getElementById('preview-next-action').textContent =
+            data.nextActionDate + (data.nextActionType ? ` — ${data.nextActionType}` : '');
+          nextActionRowEl.style.display = 'flex';
+        } else {
+          nextActionRowEl.style.display = 'none';
+        }
+        previewEl.style.display  = 'block';
+        statusEl.textContent     = 'Found on ILGA ✓';
+        statusEl.className       = 'lookup-status success';
+        document.getElementById('add-bill-number-input').value = data.billNumber;
+      } catch (e) {
+        statusEl.textContent = e.message;
+        statusEl.className   = 'lookup-status error';
+      }
+    }
+
+    async function submitAddBill() {
+      const rawNum    = document.getElementById('add-bill-number-input').value.trim().toUpperCase();
+      const title     = document.getElementById('add-bill-title').value.trim();
+      const category  = document.getElementById('add-bill-category').value;
+      const description = document.getElementById('add-bill-description').value.trim();
+      const errorEl   = document.getElementById('add-bill-error');
+      const submitBtn = document.getElementById('add-bill-submit');
+
+      // Validate
+      const m = rawNum.match(/^([A-Z]+)(\d+)$/);
+      if (!m) {
+        errorEl.textContent = 'Invalid bill number format. Use e.g. HB1234 or SB567.';
+        errorEl.style.display = 'block';
+        return;
+      }
+      if (!title) {
+        errorEl.textContent = 'Title is required.';
+        errorEl.style.display = 'block';
+        return;
+      }
+      if (legislationData.some(b => b.billNumber === rawNum)) {
+        errorEl.textContent = `${rawNum} is already in the tracker.`;
+        errorEl.style.display = 'block';
+        return;
+      }
+      errorEl.style.display = 'none';
+
+      submitBtn.textContent = 'Adding…';
+      submitBtn.disabled    = true;
+
+      const docType = m[1], rawDocNum = m[2];
+      const currentYear = new Date().getFullYear();
+      const billData = {
+        id:            `user-${rawNum}`,
+        billNumber:    rawNum,
+        title,
+        description,
+        year:          [currentYear],
+        status:        'Not passed into law',
+        category,
+        url:           addBillIlgaData?.ilgaUrl
+                       || `https://www.ilga.gov/Legislation/BillStatus?DocNum=${rawDocNum}&GAID=18&DocTypeID=${docType}&SessionID=114`,
+        primarySponsor:  addBillIlgaData?.primarySponsor  || '',
+        stage:           addBillIlgaData?.stage            || 'Unknown',
+        lastAction:      addBillIlgaData?.lastAction       || '',
+        lastActionDate:  addBillIlgaData?.lastActionDate   || '',
+        ilgaFetchedAt:   addBillIlgaData ? new Date().toISOString() : '',
+        stageChangedAt:  null,
+        nextActionDate:  addBillIlgaData?.nextActionDate  || null,
+        nextActionType:  addBillIlgaData?.nextActionType  || null,
+        userAdded:       true
+      };
+
+      try {
+        await addBill(billData);
+        closeAddBillModal();
+      } catch (e) {
+        errorEl.textContent   = e.message.includes('401')
+          ? 'Auth error — check your Personal Access Token in Settings (⚙).'
+          : `Error: ${e.message}`;
+        errorEl.style.display = 'block';
+      } finally {
+        submitBtn.textContent = 'Add Bill';
+        submitBtn.disabled    = false;
+      }
+    }
+
+    async function addBill(billData) {
+      const { content, sha } = await readGitHubFile('data/user-bills.json');
+      const userBills = content || [];
+      userBills.push(billData);
+      await writeGitHubFile('data/user-bills.json', userBills, sha, `Add bill: ${billData.billNumber}`);
+      legislationData.push(billData);
+      updateStats();
+      renderCards();
+    }
+
+    // ── Event listeners ───────────────────────────────────────────────────────
+    function setupEventListeners() {
+      statusFilter.addEventListener('change', (e) => { currentFilters.status = e.target.value; renderCards(); });
+      yearFilter.addEventListener('change',   (e) => { currentFilters.year   = e.target.value; renderCards(); });
+      changedSinceEl.addEventListener('change',(e) => { currentFilters.changedSince = e.target.value; renderCards(); });
+      hearingsEl.addEventListener('change',   (e) => { currentFilters.upcomingOnly  = e.target.checked; renderCards(); });
+
+      clearFiltersBtn.addEventListener('click', () => {
+        currentFilters = { status: "All", year: "All", changedSince: "", upcomingOnly: false };
+        statusFilter.value    = "All";
+        yearFilter.value      = "All";
+        changedSinceEl.value  = "";
+        hearingsEl.checked    = false;
+        renderCards();
+      });
+
+      document.getElementById('modal-close').addEventListener('click', closeModal);
+      document.getElementById('modal-close-btn').addEventListener('click', closeModal);
+      modalOverlay.addEventListener('click', (e) => { if (e.target === modalOverlay) closeModal(); });
+      document.getElementById('add-bill-overlay').addEventListener('click', (e) => {
+        if (e.target === document.getElementById('add-bill-overlay')) closeAddBillModal();
+      });
+      document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape') {
+          closeModal();
+          closeAddBillModal();
+          if (getConfig()) closeSetupModal(); // only close setup modal on Esc if already configured
+        }
+      });
+    }
+
+    document.addEventListener('DOMContentLoaded', init);
+  </script>
+</body>
+</html>
